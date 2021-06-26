@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Setting COM="COM4" Frequency="5" Path="C:\">
+  <LV LV="1" Value="3" TV="1/320" ISO="ISO 800" AV="5.6" Flash="ON" />
+  <LV LV="2" Value="20" TV="1/800" ISO="ISO 800" AV="5.6" Flash="ON" />
+  <LV LV="3" Value="30" TV="1/1000" ISO="ISO 800" AV="5.6" Flash="OFF" />
+  <LV LV="4" Value="40" TV="1/1000" ISO="ISO 800" AV="5.6" Flash="OFF" />
+  <LV LV="5" Value="70" TV="1/1000" ISO="ISO 400" AV="5.6" Flash="OFF" />
+  <LV LV="6" Value="100" TV="1/1000" ISO="ISO 400" AV="6.3" Flash="OFF" />
+  <LV LV="7" Value="120" TV="1/1000" ISO="ISO 200" AV="8" Flash="OFF" />
+  <LV LV="8" Value="140" TV="1/1000" ISO="ISO 400" AV="8" Flash="OFF" />
+  <LV LV="9" Value="160" TV="1/1000" ISO="ISO 400" AV="9" Flash="OFF" />
+  <LV LV="10" Value="255" TV="1/1000" ISO="ISO 800" AV="9" Flash="ON" />
+</Setting>
