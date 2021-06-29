@@ -121,8 +121,7 @@ namespace CameraControl
 
         public void Set(int index)
         {
-            uint key = (uint)_desc.PropDesc[this.SelectedIndex];
-            _actionSource.FireEvent(ActionEvent.Command.SET_TV, (IntPtr)key);
+            _actionSource.FireEvent(ActionEvent.Command.SET_TV, (IntPtr)index);
         }
 
         public void Update(Observable from, CameraEvent e)

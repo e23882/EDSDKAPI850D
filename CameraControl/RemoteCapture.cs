@@ -38,6 +38,7 @@ namespace CameraControl
         string SavePath = "";
         Dictionary<int, SettingData> TotalSetting = new Dictionary<int, SettingData>();
         Thread checkThread = null;
+        bool showError = false;
 
         public class SettingData
         {
@@ -146,7 +147,8 @@ namespace CameraControl
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"讀取設定發生例外 : {ex.Message}\r\n{ex.StackTrace}");
+                if (showError)
+                    MessageBox.Show($"讀取設定發生例外 : {ex.Message}\r\n{ex.StackTrace}");
             }
 
         }
@@ -171,7 +173,8 @@ namespace CameraControl
             }
             catch (Exception ie)
             {
-                MessageBox.Show($"設定介面時發生例外 {ie.Message}");
+                if (showError)
+                    MessageBox.Show($"設定介面時發生例外 {ie.Message}");
             }
         }
         string Flash = "ON";
@@ -194,7 +197,8 @@ namespace CameraControl
             }
             catch(Exception ex) 
             {
-                MessageBox.Show($"讀取設定失敗 {ex.Message}，重新產生預設設定");
+                if (showError)
+                    MessageBox.Show($"讀取設定失敗 {ex.Message}，重新產生預設設定");
                 CreatDefaultSetting();
                 return;
             }
@@ -202,6 +206,12 @@ namespace CameraControl
 
             var root = xmlDoc.SelectSingleNode("Setting");
             SavePath = ((XmlElement)root).GetAttribute("Path");
+            var showErrorData = ((XmlElement)root).GetAttribute("ShowError");
+            if (showErrorData.Equals("False"))
+                showError = false;
+            if (showErrorData.Equals("True"))
+                showError = true;
+
 
             var data = xmlDoc.SelectNodes("Setting/LV");
             TotalSetting.Clear();
@@ -305,7 +315,7 @@ namespace CameraControl
             //Set UI Info
             label9.InvokeIfRequired(() =>
             {
-                label9.Text = $"測光值: {lightValue}\rAV : {Aperture}\rISO : {ISO}\rTV : {Shutter}\rFlash : {Flash}";
+                label9.Text = $"測光值: {lightValue}\rAV : {Aperture}\r{ISO}\rTV : {Shutter}\rFlash : {Flash}";
             });
             //Set Camera
             SettingAV(Aperture);
@@ -353,22 +363,24 @@ namespace CameraControl
             try
             {
                 int index = 0;
+                int cameraValue = 48;
                 switch (decimalAV)
                 {
-                    case 5.0:
-                        index = 0;
-                        break;
                     case 5.6:
                         index = 1;
+                        cameraValue = 48;
                         break;
                     case 6.3:
                         index = 2;
+                        cameraValue = 51;
                         break;
                     case 8.0:
                         index = 4;
+                        cameraValue = 56;
                         break;
                     case 9.0:
                         index = 5;
+                        cameraValue = 59;
                         break;
                     default:
                         index = 999;
@@ -376,20 +388,22 @@ namespace CameraControl
                 }
                 if (index == 999) 
                 {
-                    MessageBox.Show($"設定相機光圈(AV)發生錯誤:\r\n設定值{value} 找不到對應項目");
+                    if(showError)
+                        MessageBox.Show($"設定相機光圈(AV)發生錯誤:\r\n設定值{value} 找不到對應項目");
                 }
                 else 
                 {
                     av1.InvokeIfRequired(() =>
                     {
                         av1.SelectedIndex = index;
-                        av1.Set(index);
+                        av1.Set(cameraValue);
                     });
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"設定相機光圈發生例外\r\n{ex.Message}\r\n{ex.StackTrace}");
+                if (showError)
+                    MessageBox.Show($"設定相機光圈發生例外\r\n{ex.Message}\r\n{ex.StackTrace}");
             }
         }
 
@@ -402,6 +416,7 @@ namespace CameraControl
             try
             {
                 int index = 0;
+                int cameraValue = 0;
                 switch (value)
                 {
                     case "1/160":
@@ -415,6 +430,7 @@ namespace CameraControl
                         break;
                     case "1/320":
                         index = 41;
+                        cameraValue = 123;
                         break;
                     case "1/400":
                         index = 42;
@@ -424,12 +440,15 @@ namespace CameraControl
                         break;
                     case "1/640":
                         index = 44;
+                        cameraValue = 131;
                         break;
                     case "1/800":
                         index = 45;
+                        cameraValue = 133;
                         break;
                     case "1/1000":
                         index = 46;
+                        cameraValue = 136;
                         break;
                     case "1/1250":
                         index = 47;
@@ -444,20 +463,22 @@ namespace CameraControl
 
                 if (index > 100)
                 {
-                    MessageBox.Show($"設定相機快門(TV)發生錯誤\r\nTV設定值{value}找不到對應值");
+                    if (showError)
+                        MessageBox.Show($"設定相機快門(TV)發生錯誤\r\nTV設定值{value}找不到對應值");
                 }
                 else
                 {
                     tv1.InvokeIfRequired(() =>
                     {
                         tv1.SelectedIndex = index;
-                        tv1.Set(index);
+                        tv1.Set(cameraValue);
                     });
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"設定相機快門發生例外\r\n{ex.Message}\r\n{ex.StackTrace}");
+                if (showError)
+                    MessageBox.Show($"設定相機快門發生例外\r\n{ex.Message}\r\n{ex.StackTrace}");
             }
         }
 
@@ -470,7 +491,8 @@ namespace CameraControl
                 new XElement("Setting",
                 new XAttribute("COM", "COM4"),
                 new XAttribute("Frequency", "180"),
-                    new XAttribute("Path", "C:\\"),
+                new XAttribute("Path", "C:\\"),
+                new XAttribute("ShowError", "False"),
                         new XElement("LV",
                             new XAttribute("LV", "1"),
                             new XAttribute("Value", "3"),
@@ -574,22 +596,28 @@ namespace CameraControl
             try
             {
                 int index = 99990;
+                int cameraValue = 0;
                 switch (value)
                 {
                     case "ISO 100":
                         index = 1;
+                        cameraValue = 72;
                         break;
                     case "ISO 200":
                         index = 4;
+                        cameraValue = 80;
                         break;
                     case "ISO 400":
                         index = 7;
+                        cameraValue = 88;
                         break;
                     case "ISO 800":
                         index = 10;
+                        cameraValue = 96;
                         break;
                     case "ISO 1600":
                         index = 13;
+                        cameraValue = 104;
                         break;
                     default:
                         index = 9999;
@@ -597,20 +625,21 @@ namespace CameraControl
                 }
                 if (index > 100) 
                 {
-                    MessageBox.Show($"設定相機ISO發生錯誤\r\nISO設定值{value}找不到對應值");
+                    if (showError)
+                        MessageBox.Show($"設定相機ISO發生錯誤\r\nISO設定值{value}找不到對應值");
                 }
                 else 
                 {
                     iso1.InvokeIfRequired(() =>
                     {
-                        iso1.SelectedIndex = index;
-                        iso1.Set(index);
+                        iso1.Set(cameraValue);
                     });
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"設定相機ISO發生例外\r\n{ex.Message}\r\n{ex.StackTrace}");
+                if (showError)
+                    MessageBox.Show($"設定相機ISO發生例外\r\n{ex.Message}\r\n{ex.StackTrace}");
             }
         }
         

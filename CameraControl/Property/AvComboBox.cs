@@ -99,9 +99,7 @@ namespace CameraControl
 
         public void Set(int index) 
         {
-            uint key = (uint)_desc.PropDesc[index];
-
-            _actionSource.FireEvent(ActionEvent.Command.SET_AV, (IntPtr)key);
+            _actionSource.FireEvent(ActionEvent.Command.SET_AV, (IntPtr)index);
         }
 
         public void Update(Observable from, CameraEvent e)
